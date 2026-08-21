@@ -1,7 +1,16 @@
+let cart = JSON.parse(localStorage.getItem("cart")) || {};
+
 let total = 0;
 let cartCount = 0;
 
-let cart = {};
+for (let itemName in cart) {
+
+    const quantity = cart[itemName].quantity;
+    const price = cart[itemName].price;
+
+    cartCount += quantity;
+    total += quantity * price;
+}
 
 function addToCart(itemName, price){
 
@@ -35,6 +44,7 @@ function addToCart(itemName, price){
             quantity: 1
         };
     }
+    localStorage.setItem("cart", JSON.stringify(cart));
 
     renderCart();
 }
@@ -57,11 +67,28 @@ function renderCart(){
             cart[itemName].price;
 
         item.innerHTML = `
-            ${itemName} x${quantity} - ₹${quantity * price}
-            <button class="remove-btn" onclick="removeItem('${itemName}')">
-                ❌
-            </button>
-        `;
+    <h3>${itemName}</h3>
+    <p>Price: ₹${price}</p>
+
+    <div class="quantity-controls">
+        <button class="quantity-btn"
+            onclick="decreaseQuantity('${itemName}')">
+            −
+        </button>
+
+        <span class="quantity">${quantity}</span>
+
+        <button class="quantity-btn"
+            onclick="increaseQuantity('${itemName}')">
+            +
+        </button>
+    </div>
+
+    <button class="remove-btn"
+        onclick="removeItem('${itemName}')">
+        Remove
+    </button>
+`;
 
         cartItems.appendChild(item);
     }
@@ -70,20 +97,111 @@ function renderCart(){
         .textContent =
         "Total: ₹" + total;
 }
+function increaseQuantity(itemName) {
 
-function checkout(){
+    cart[itemName].quantity++;
+
+    total += cart[itemName].price;
+    cartCount++;
+
+    document.getElementById("cart-count").textContent = cartCount;
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    renderCart();
+}
+function decreaseQuantity(itemName) {
+
+    if(cart[itemName].quantity > 1) {
+
+        cart[itemName].quantity--;
+
+        total -= cart[itemName].price;
+        cartCount--;
+
+        document.getElementById("cart-count").textContent = cartCount;
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        renderCart();
+    }
+}
+
+async function checkout() {
 
     const message =
         document.getElementById("message");
 
-    if(cartCount === 0){
+    if (cartCount === 0) {
+
         message.textContent =
             "⚠️ Your cart is empty!";
+
         return;
     }
 
-    message.textContent =
-        "✅ Order placed successfully!";
+    const orderId =
+        "CAN" + Date.now();
+
+    const order = {
+
+        orderId: orderId,
+
+        items: Object.keys(cart).map(itemName => ({
+            name: itemName,
+            price: cart[itemName].price,
+            quantity: cart[itemName].quantity
+        })),
+
+        total: total
+    };
+
+    try {
+
+        const response =
+            await fetch("http://localhost:5000/api/orders", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(order)
+            });
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        message.innerHTML = `
+            ✅ Order placed successfully!<br>
+            Order ID: <strong>${data.order.orderId}</strong><br>
+            Total: ₹${data.order.total}<br>
+            Status: ${data.order.status}
+        `;
+
+        // Clear cart
+
+        cart = {};
+        total = 0;
+        cartCount = 0;
+
+        localStorage.removeItem("cart");
+
+        document.getElementById("cart-count")
+            .textContent = "0";
+
+        renderCart();
+
+    } catch (error) {
+
+        console.error("Order error:", error);
+
+        message.textContent =
+            "❌ Failed to place order. Please try again.";
+    }
 }
 function removeItem(itemName){
 
@@ -98,6 +216,8 @@ function removeItem(itemName){
     cartCount -= quantity;
 
     delete cart[itemName];
+
+    localStorage.setItem("cart", JSON.stringify(cart));
 
     document.getElementById("cart-count")
         .textContent = cartCount;
@@ -115,23 +235,6 @@ function removeItem(itemName){
     }
 
     renderCart();
-}
-function clearCart(){
-
-    cart = {};
-    total = 0;
-    cartCount = 0;
-
-    document.getElementById("cart-count")
-        .textContent = 0;
-
-    document.getElementById("cart-items")
-        .innerHTML =
-        '<p id="empty-cart">No items added yet</p>';
-
-    document.getElementById("total")
-        .textContent =
-        "Total: ₹0";
 }
 function searchFood(){
 
@@ -177,3 +280,173 @@ function filterFood(category){
 
     });
 }
+async function loadProducts() {
+
+    try {
+
+        const response =
+            await fetch("http://localhost:5000/api/products");
+
+        const products =
+            await response.json();
+
+        const menuContainer =
+            document.getElementById("menu-container");
+
+        menuContainer.innerHTML = "";
+
+        products.forEach(product => {
+
+            const card =
+                document.createElement("div");
+
+            card.className = "food-card";
+
+            card.dataset.category =
+                product.category;
+
+            card.innerHTML = `
+                <img src="${product.image}"
+                     alt="${product.name}">
+
+                <h3>${product.name}</h3>
+
+                <p>₹${product.price}</p>
+
+                <button
+                    onclick="addToCart('${product.name}', ${product.price})"
+                    class="order-btn">
+                    Add to Cart
+                </button>
+            `;
+
+            menuContainer.appendChild(card);
+        });
+
+    }
+    catch(error) {
+
+        console.error("Error loading products:", error);
+
+    }
+}
+loadProducts();
+
+renderCart();
+
+document.getElementById("cart-count").textContent = cartCount;
+renderCart();
+
+document.getElementById("cart-count").textContent = cartCount;
+fetch("http://localhost:5000/api/products")
+    .then(response => response.json())
+    .then(products => {
+
+        console.log("Products from backend:", products);
+
+        const menuContainer =
+            document.querySelector(".menu-container");
+
+        menuContainer.innerHTML = "";
+
+        products.forEach(product => {
+
+            const card =
+                document.createElement("div");
+
+            card.className = "food-card";
+
+            card.dataset.category = product.category;
+
+            card.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+
+                <h3>${product.name}</h3>
+
+                <p>₹${product.price}</p>
+
+                <button
+                    class="order-btn"
+                    onclick="addToCart('${product.name}', ${product.price})">
+                    Add to Cart
+                </button>
+            `;
+
+            menuContainer.appendChild(card);
+        });
+
+    })
+    .catch(error => {
+        console.error("Error fetching products:", error);
+    });
+    function loadOrders() {
+
+    fetch("http://localhost:5000/api/orders")
+        .then(response => response.json())
+        .then(orders => {
+
+            const container =
+                document.getElementById("orders-container");
+
+            container.innerHTML = "";
+
+            if (orders.length === 0) {
+
+                container.innerHTML =
+                    "<p>No orders yet.</p>";
+
+                return;
+            }
+
+            orders.forEach(order => {
+
+                const orderCard =
+                    document.createElement("div");
+
+                orderCard.className = "order-card";
+
+                orderCard.innerHTML = `
+                    <h3>Order ID: ${order.orderId}</h3>
+
+                    <p>
+                        Total: ₹${order.total}
+                    </p>
+
+                    <p>
+                        Status: ${order.status}
+                    </p>
+
+                    <p>
+                        Date: ${new Date(order.date).toLocaleString()}
+                    </p>
+
+                    <h4>Items</h4>
+                `;
+
+                order.items.forEach(item => {
+
+                    const itemElement =
+                        document.createElement("p");
+
+                    itemElement.textContent =
+                        `${item.name} × ${item.quantity} — ₹${item.price * item.quantity}`;
+
+                    orderCard.appendChild(itemElement);
+
+                });
+
+                container.appendChild(orderCard);
+
+            });
+
+        })
+        .catch(error => {
+
+            console.error(
+                "Error loading orders:",
+                error
+            );
+
+        });
+}
+loadOrders();

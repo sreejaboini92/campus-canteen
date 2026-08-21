@@ -55,40 +55,9 @@
     </button>
 
 </div>
-    <div class="menu-container">
-        <div data-category="meals" class="food-card">
-            <img src="images/biryani.jpeg" alt="veg Biryani">
-    <h3>Veg Biryani</h3>
-    <p>₹80</p>
-
-    <button onclick="addToCart('Veg Biryani',80)"
-            class="order-btn">
-        Add to Cart
-    </button>
+    <div class="menu-container" id = "menu-container">
+        
 </div>
-
-<div data-category="snacks" class="food-card">
-    <img src="images/burger.jpeg" alt="Burger">
-    <h3>Burger</h3>
-    <p>₹60</p>
-
-    <button onclick="addToCart('Burger',60)"
-            class="order-btn">
-        Add to Cart
-    </button>
-</div>
-
-<div data-category="desserts" class="food-card">
-    <img src="images/dosa.jpeg" alt="masala Dosa">
-    <h3>Masala Dosa</h3>
-    <p>₹50</p>
-
-    <button onclick="addToCart('Masala Dosa',50)"
-            class="order-btn">
-        Add to Cart
-    </button>
-</div>
-    </div>
 </section>
 <section class="cart-preview">
     <h2>Your Cart</h2>
@@ -108,21 +77,83 @@
         <p id="message"></p>
     </div>
 </section>
+<section class="order-history">
+
+    <h2>Order History</h2>
+
+    <div id="orders-container">
+        <p>Loading orders...</p>
+    </div>
+
+</section>
+<section class="login-section">
+
+    <h2>Login</h2>
+
+    <form id="login-form">
+
+        <input
+            type="email"
+            id="login-email"
+            placeholder="Enter your email"
+            required
+        >
+
+        <input
+            type="password"
+            id="login-password"
+            placeholder="Enter your password"
+            required
+        >
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+    <p id="login-message"></p>
+
+</section>
 
 <section class="contact">
-    <h2>Contact Us</h2>
-    <form>
-        <input type="text" placeholder="Enter Your Name">
-        <input type="email" placeholder="Enter Your Email">
-        <textarea placeholder="Enter Your Message"></textarea>
-        <button type="submit" class="submit-btn">
-            Send Message
-        </button>
-    </form>
+    <h2>Create Account</h2>
+    <form id="signup-form">
+
+    <input
+        type="text"
+        id="signup-name"
+        placeholder="Enter your name"
+        required
+    >
+
+    <input
+        type="email"
+        id="signup-email"
+        placeholder="Enter your email"
+        required
+    >
+
+    <input
+        type="password"
+        id="signup-password"
+        placeholder="Enter your password"
+        required
+    >
+
+    <button type="submit">
+        Sign Up
+    </button>
+
+</form>
+
+<p id="signup-message"></p>
 </section>
 <footer>
     <p>© 2026 Campus Canteen. All Rights Reserved.</p>
 </footer>
 <script src="script.js"></script>
+<script src="signup.js"></script>
+<script src="login.js"></script>
 </body>
 </html>
