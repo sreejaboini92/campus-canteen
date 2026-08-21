@@ -393,3 +393,106 @@ footer{
     border: 1px solid #ccc;
     cursor: pointer;
 }
+.login-section,
+.contact {
+    max-width: 480px;
+    margin: 70px auto;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.login-section h2,
+.contact h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+    color: #222;
+}
+
+/* Form layout */
+
+#login-form,
+#signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Input fields */
+
+#login-form input,
+#signup-form input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+    background: #fafafa;
+}
+
+#login-form input:focus,
+#signup-form input:focus {
+    border-color: #ff6b35;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.12);
+}
+
+/* Buttons */
+
+#login-form button,
+#signup-form button {
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #ff6b35;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#login-form button:hover,
+#signup-form button:hover {
+    background: #e85a2a;
+    transform: translateY(-2px);
+}
+
+/* Messages */
+
+#login-message,
+#signup-message {
+    margin-top: 18px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Create Account section */
+
+.contact {
+    margin-top: 30px;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 600px) {
+
+    .login-section,
+    .contact {
+        width: calc(100% - 40px);
+        box-sizing: border-box;
+        padding: 30px 20px;
+        margin: 40px auto;
+    }
+
+    .login-section h2,
+    .contact h2 {
+        font-size: 24px;
+    }
+}
+
