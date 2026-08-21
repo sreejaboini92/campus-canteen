@@ -6,6 +6,9 @@ const Product = require("./models/Product");
 const Order = require("./models/Order");
 const User = require("./models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const authenticateToken =require("./middleware/authMiddleware");
+const adminOnly =require("./middleware/adminMiddleware");
 dotenv.config();
 
 const app = express();
@@ -92,7 +95,7 @@ app.get("/api/orders", async (req, res) => {
         });
     }
 });
-app.put("/api/orders/:id", async (req, res) => {
+app.put("/api/orders/:id",authenticateToken,adminOnly,async (req, res) => {
 
     try {
 
@@ -129,7 +132,7 @@ app.put("/api/orders/:id", async (req, res) => {
         });
     }
 });
-app.delete("/api/orders/:id", async (req, res) => {
+app.delete("/api/orders/:id",authenticateToken,adminOnly,async (req, res) => {
 
     try {
 
@@ -245,8 +248,25 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
+        // Create JWT token
+        const token =
+            jwt.sign(
+                {
+                    id: user._id,
+                    role: user.role
+                },
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: "1h"
+                }
+            );
+
+        // Send token + user details
         res.json({
             message: "Login successful",
+
+            token: token,
+
             user: {
                 id: user._id,
                 name: user.name,

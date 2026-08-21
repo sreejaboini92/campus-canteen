@@ -37,16 +37,26 @@ loginForm.addEventListener("submit", async function(event) {
 
         if (!response.ok) {
 
-            message.textContent =
-                "❌ " + data.message;
+    message.textContent =
+        "❌ " + data.message;
 
-            return;
-        }
+    return;
+}
 
-        message.textContent =
-            "✅ " + data.message;
+localStorage.setItem(
+    "token",
+    data.token
+);
 
-        console.log("Logged in user:", data.user);
+localStorage.setItem(
+    "user",
+    JSON.stringify(data.user)
+);
+
+message.textContent =
+    "✅ " + data.message;
+
+console.log("Logged in user:", data.user);
 
     } catch (error) {
 

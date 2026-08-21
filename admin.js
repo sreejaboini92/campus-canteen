@@ -104,7 +104,8 @@ async function updateStatus(orderId, status) {
 
                     headers: {
                         "Content-Type":
-                            "application/json"
+                            "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
                     },
 
                     body: JSON.stringify({
@@ -153,12 +154,13 @@ async function deleteOrder(orderId) {
     try {
 
         const response =
-            await fetch(
-                `http://localhost:5000/api/orders/${orderId}`,
-                {
-                    method: "DELETE"
-                }
-            );
+            await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+    method: "DELETE",
+
+    headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+    }
+});
 
         const data =
             await response.json();
